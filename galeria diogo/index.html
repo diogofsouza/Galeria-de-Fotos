@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Galeria</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: #1f1f24;
+            padding: 40px 20px;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(255, 181, 124, 0.18), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(166, 198, 255, 0.18), transparent 26%),
+                linear-gradient(135deg, #b98857 0%, #86827d 42%, #706f6c 100%);
+            background-attachment: fixed;
+            position: relative;
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            inset: auto;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.22);
+            filter: blur(20px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::before {
+            top: 80px;
+            left: 60px;
+        }
+
+        body::after {
+            right: 80px;
+            bottom: 80px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .badge {
+            display: inline-block;
+            color: #5b4d40;
+            border: 1px solid rgba(91, 77, 64, 0.35);
+            padding: 8px 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            background-color: rgba(255, 255, 255, 0.38);
+            backdrop-filter: blur(4px);
+        }
+
+        h1 {
+            font-size: 60px;
+            margin-bottom: 15px;
+            color: #2c2a2a;
+        }
+
+        h1 span {
+            color: #4d4d4d;
+        }
+
+        header p {
+            color: #4f4a47;
+            font-size: 30px;
+        }
+
+        .linha {
+            width: 70px;
+            height: 3px;
+            background: linear-gradient(90deg, #d6b69c, #8a7a6d);
+            margin: 20px auto;
+        }
+
+        .galeria {
+            max-width: 1100px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(180px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background-color: rgba(255, 255, 255, 0.55);
+            border: 1px solid rgba(116, 104, 96, 0.18);
+            padding: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 10px 25px rgba(66, 54, 43, 0.08);
+            max-width: 240px;
+            width: 100%;
+            margin: 0 auto;
+            backdrop-filter: blur(6px);
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(120, 104, 90, 0.3);
+            box-shadow:
+                0 12px 28px rgba(73, 57, 46, 0.12),
+                0 0 0 1px rgba(180, 155, 134, 0.1);
+        }
+
+        .imagem {
+            width: 100%;
+            height: 320px;
+            overflow: hidden;
+            background-color: #220008;
+        }
+
+        .imagem img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.3s;
+        }
+
+        .card:hover img {
+            transform: scale(1.05);
+        }
+
+        .texto {
+            padding: 15px 5px 8px;
+        }
+
+        .categoria {
+            color: #6a5448;
+            font-size: 13px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .titulo {
+            font-size: 21px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+            color: #2b2b2d;
+        }
+
+        .autor {
+            color: #776c63;
+            font-size: 14px;
+            font-style: italic;
+        }
+
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(20, 19, 21, 0.18);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 10;
+        }
+
+        .lightbox.abrir {
+            display: flex;
+        }
+
+        .caixa {
+            width: 900px;
+            max-width: 100%;
+            max-height: 90vh;
+            background: rgba(22, 21, 24, 0.72);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(18, 14, 12, 0.18);
+            backdrop-filter: blur(8px);
+        }
+
+        .imagem-grande {
+            width: 55%;
+            background: rgba(255, 255, 255, 0.02);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .imagem-grande img {
+            width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+        }
+
+        .informacoes {
+            width: 45%;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .tag {
+            color: #f3e7dc;
+            border: 1px solid rgba(243, 231, 220, 0.45);
+            display: inline-block;
+            padding: 5px 10px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            width: fit-content;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .informacoes h2 {
+            font-size: 30px;
+            margin-bottom: 10px;
+            color: #f7f3ee;
+        }
+
+        .informacoes h4 {
+            color: #e1d7cd;
+            font-style: italic;
+            font-weight: normal;
+            margin-bottom: 20px;
+        }
+
+        .descricao {
+            color: #efe7e0;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .contador {
+            color: #f2e9e2;
+            margin-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.18);
+            padding-top: 15px;
+        }
+
+        .fechar,
+        .anterior,
+        .proximo {
+            position: absolute;
+            background-color: #111116;
+            color: white;
+            border: 1px solid #fcf6f7;
+            cursor: pointer;
+            width: 45px;
+            height: 45px;
+            font-size: 22px;
+        }
+
+        .fechar {
+            top: 20px;
+            right: 20px;
+        }
+
+        .anterior {
+            left: 20px;
+            top: 50%;
+        }
+
+        .proximo {
+            right: 20px;
+            top: 50%;
+        }
+
+        .fechar:hover,
+        .anterior:hover,
+        .proximo:hover {
+            background-color: #f5f1f2;
+        }
+
+        @media (max-width: 800px) {
+
+            .galeria {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 35px;
+            }
+
+            .caixa {
+                flex-direction: column;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+
+            .imagem-grande {
+                width: 100%;
+                height: 300px;
+            }
+
+            .informacoes {
+                width: 100%;
+                padding: 25px;
+            }
+
+            .anterior,
+            .proximo {
+                display: none;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <header>
+
+        <div class="badge">
+            ✦ Fotografias
+        </div>
+
+        <h1>
+            Diogo Fernandes
+            
+        </h1>
+
+        <p>
+            Minhas fotos
+        </p>
+
+        <div class="linha"></div>
+
+    </header>
+
+    <main>
+
+        <div
+            class="galeria"
+            id="galeria"
+        >
+        </div>
+
+    </main>
+
+    <div
+        class="lightbox"
+        id="lightbox"
+    >
+
+        <button
+            class="fechar"
+            id="fechar"
+        >
+            X
+        </button>
+
+        <button
+            class="anterior"
+            id="anterior"
+        >
+            <
+        </button>
+
+        <button
+            class="proximo"
+            id="proximo"
+        >
+            >
+        </button>
+
+        <div class="caixa">
+
+            <div class="imagem-grande">
+
+                <img
+                    id="imagem-grande"
+                    src=""
+                    alt=""
+                >
+
+            </div>
+
+            <div class="informacoes">
+
+                <span
+                    class="tag"
+                    id="tag"
+                >
+                </span>
+
+                <h2 id="titulo">
+                </h2>
+
+                <h4 id="autor">
+                </h4>
+
+                <p
+                    class="descricao"
+                    id="descricao"
+                >
+                </p>
+
+                <div
+                    class="contador"
+                    id="contador"
+                >
+                    01 / 08
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        var projetos = [
+
+            {
+                titulo: "",
+                autor: "",
+                categoria: "",
+                imagem: "img_2460.jpg",
+                descricao: ""
+            },
+
+            {
+                titulo: "",
+                autor: "",
+                categoria: "",
+                imagem: "img_2461.jpg",
+                descricao: ""
+            },
+
+            {
+                titulo: "",
+                autor: "",
+                categoria: "",
+                imagem: "img_2462.jpg",
+                descricao: ""
+            },
+
+            {
+                titulo: "",
+                autor: "",
+                categoria: "",   
+                imagem: "img_2463.jpg",
+                descricao: ""
+            },
+
+            {
+                titulo: "",
+                autor: "",
+                categoria: "",
+                imagem: "img_2464.jpg",
+                descricao: ""
+            },
+
+            {
+                titulo: "",
+                autor: "",
+                categoria: "",
+                imagem: "img_2466.jpg",
+                descricao: ""
+            },
+
+            {
+                titulo: "",
+                autor: "",
+                categoria: "",
+                imagem: "Foto Diogo (1).png",
+                descricao: ""
+            },
+
+            {
+                titulo: "",
+                autor: "",
+                categoria: "",
+                imagem: "img_2831.jpg",
+                descricao: ""
+            },
+            {
+                titulo: "",
+                autor: "",
+                categoria: "",
+                imagem: "img_2832.jpg",
+                descricao: ""
+            },
+            {
+                titulo: "",
+                autor: "",
+                categoria: "",
+                imagem: "img_2833.jpg",
+                descricao: ""
+            },
+            {
+                titulo: "",
+                autor: "",
+                categoria: "",
+                imagem: "img_2834.jpg",
+                descricao: ""
+            },  
+            {
+                titulo: "",
+                autor: "",
+                categoria: "",
+                imagem: "img_2835.jpg",
+                descricao: ""
+            },
+            
+            {
+                titulo: "",
+                autor: "",
+                categoria: "",
+                imagem: "img_2836.jpg",
+                descricao: ""
+            },
+
+            {
+                titulo: "",
+                autor: "",
+                categoria: "",
+                imagem: "unnamed.jpg",
+                descricao: ""
+            },
+
+            {
+                titulo: "",
+                autor: "",
+                categoria: "",
+                imagem: "img_3169.jpg",
+                descricao: ""
+            },
+
+            {
+                titulo: "",
+                autor: "",
+                categoria: "",
+                imagem: "img_3171.jpg",
+                descricao: ""
+            },
+            
+            {
+                titulo: "",
+                autor: "",
+                categoria: "",
+                imagem: "img_3867.jpg",
+                descricao: ""
+            },
+            
+            {
+                titulo: "",
+                autor: "",
+                categoria: "",
+                imagem: "img_3868.jpg",
+                descricao: ""
+            },
+            
+            {
+                titulo: "",
+                autor: "",
+                categoria: "",
+                imagem: "img_3869.jpg",
+                descricao: ""
+            },
+            
+            {
+                titulo: "",
+                autor: "",
+                categoria: "",
+                imagem: "img_3870.jpg",
+                descricao: ""
+            },
+            
+            {
+                titulo: "",
+                autor: "",
+                categoria: "",
+                imagem: "img_3871.jpg",
+                descricao: ""
+            },
+            
+            {
+                titulo: "",
+                autor: "",
+                categoria: "",
+                imagem: "img_3872.jpg",
+                descricao: ""
+            },
+            
+            
+        ];
+
+        var galeria =
+            document.getElementById("galeria");
+
+        var lightbox =
+            document.getElementById("lightbox");
+
+        var imagemGrande =
+            document.getElementById("imagem-grande");
+
+        var tag =
+            document.getElementById("tag");
+
+        var titulo =
+            document.getElementById("titulo");
+
+        var autor =
+            document.getElementById("autor");
+
+        var descricao =
+            document.getElementById("descricao");
+
+        var contador =
+            document.getElementById("contador");
+
+        var fechar =
+            document.getElementById("fechar");
+
+        var anterior =
+            document.getElementById("anterior");
+
+        var proximo =
+            document.getElementById("proximo");
+
+        var obraAtual = 0;
+
+        function criarGaleria() {
+
+            for (
+                var i = 0;
+                i < projetos.length;
+                i++
+            ) {
+
+                var projeto = projetos[i];
+
+                var card =
+                    document.createElement("div");
+
+                card.className = "card";
+
+                card.innerHTML =
+
+                    '<div class="imagem">' +
+
+                        '<img src="' +
+                        projeto.imagem +
+                        '" alt="' +
+                        projeto.titulo +
+                        '">' +
+
+                    '</div>' +
+
+                    '<div class="texto">' +
+
+                        '<p class="categoria">' +
+                        projeto.categoria +
+                        '</p>' +
+
+                        '<h2 class="titulo">' +
+                        projeto.titulo +
+                        '</h2>' +
+
+                        '<p class="autor">' +
+                        ' ' +
+                        projeto.autor +
+                        '</p>' +
+
+                    '</div>';
+
+                card.onclick =
+                    function() {
+
+                        abrirObra(
+                            this.numero
+                        );
+
+                    };
+
+                card.numero = i;
+
+                galeria.appendChild(card);
+
+            }
+
+        }
+
+        function abrirObra(numero) {
+
+            obraAtual = numero;
+
+            var projeto =
+                projetos[obraAtual];
+
+            imagemGrande.src =
+                projeto.imagem;
+
+            imagemGrande.alt =
+                projeto.titulo;
+
+            tag.innerHTML =
+                projeto.categoria;
+
+            titulo.innerHTML =
+                projeto.titulo;
+
+            autor.innerHTML =
+                "Obra de " +
+                projeto.autor;
+
+            descricao.innerHTML =
+                projeto.descricao;
+
+            contador.innerHTML =
+                (obraAtual + 1) +
+                " / " +
+                projetos.length;
+
+            lightbox.className =
+                "lightbox abrir";
+
+        }
+
+        fechar.onclick =
+            function() {
+
+                lightbox.className =
+                    "lightbox";
+
+            };
+
+        proximo.onclick =
+            function() {
+
+                obraAtual++;
+
+                if (
+                    obraAtual >= projetos.length
+                ) {
+
+                    obraAtual = 0;
+
+                }
+
+                abrirObra(obraAtual);
+
+            };
+
+        anterior.onclick =
+            function() {
+
+                obraAtual--;
+
+                if (
+                    obraAtual < 0
+                ) {
+
+                    obraAtual =
+                        projetos.length - 1;
+
+                }
+
+                abrirObra(obraAtual);
+
+            };
+
+        lightbox.onclick =
+            function(evento) {
+
+                if (
+                    evento.target == lightbox
+                ) {
+
+                    lightbox.className =
+                        "lightbox";
+
+                }
+
+            };
+
+        document.onkeydown =
+            function(evento) {
+
+                if (
+                    evento.key == "Escape"
+                ) {
+
+                    lightbox.className =
+                        "lightbox";
+
+                }
+
+                if (
+                    evento.key == "ArrowRight"
+                ) {
+
+                    obraAtual++;
+
+                    if (
+                        obraAtual >= projetos.length
+                    ) {
+
+                        obraAtual = 0;
+
+                    }
+
+                    abrirObra(obraAtual);
+
+                }
+
+                if (
+                    evento.key == "ArrowLeft"
+                ) {
+
+                    obraAtual--;
+
+                    if (
+                        obraAtual < 0
+                    ) {
+
+                        obraAtual =
+                            projetos.length - 1;
+
+                    }
+
+                    abrirObra(obraAtual);
+
+                }
+
+            };
+
+        criarGaleria();
+
+    </script>
+
+</body>
+
+</html>
